@@ -1,0 +1,332 @@
+{
+  "rules": "v1.0",
+  "license": "CC0-1.0",
+  "placement": [
+    { "id": "place-lower-other-suit", "description": "レーン札より小さいカードは置けない", "lane": "9♠", "card": "8♥", "expected": false },
+    { "id": "place-lower-same-suit", "description": "同じスーツでも、レーン札より小さければ置けない", "lane": "9♠", "card": "8♠", "expected": false },
+    { "id": "place-small", "description": "2は2より大きいレーンには置けない", "lane": "9♠", "card": "2♠", "expected": false },
+    { "id": "place-equal", "description": "レーン札と同じ数字なら置ける", "lane": "9♠", "card": "9♥", "expected": true },
+    { "id": "place-higher", "description": "レーン札より大きければ置ける", "lane": "9♠", "card": "10♦", "expected": true },
+    { "id": "place-face-on-number", "description": "絵札は2〜10のレーンに置ける", "lane": "9♠", "card": "K♣", "expected": true },
+    { "id": "place-ace-on-number", "description": "Aは数字に関係なく置ける", "lane": "9♠", "card": "A♣", "expected": true },
+    { "id": "place-joker-on-number", "description": "ジョーカーはどのレーンにも置ける", "lane": "9♠", "card": "JK", "expected": true },
+    { "id": "place-two-on-two", "description": "2のレーンには2も置ける", "lane": "2♦", "card": "2♠", "expected": true },
+    { "id": "place-any-on-ace-lane", "description": "Aのレーンは数字1なので、2も置ける", "lane": "A♥", "card": "2♣", "expected": true },
+    { "id": "place-king-on-ace-lane", "description": "Aのレーンには絵札も置ける", "lane": "A♥", "card": "K♠", "expected": true },
+    { "id": "place-ace-on-ace-lane", "description": "Aのレーンには別のAも置ける", "lane": "A♥", "card": "A♠", "expected": true },
+    { "id": "place-ten-on-jack", "description": "Jのレーンに10は置けない", "lane": "J♣", "card": "10♣", "expected": false },
+    { "id": "place-jack-on-jack", "description": "Jのレーンには J 以上の絵札が置ける（J）", "lane": "J♣", "card": "J♥", "expected": true },
+    { "id": "place-queen-on-jack", "description": "Jのレーンには J 以上の絵札が置ける（Q）", "lane": "J♣", "card": "Q♦", "expected": true },
+    { "id": "place-ace-on-jack", "description": "Jのレーンにも A は置ける", "lane": "J♣", "card": "A♠", "expected": true },
+    { "id": "place-joker-on-jack", "description": "Jのレーンにもジョーカーは置ける", "lane": "J♣", "card": "JK", "expected": true },
+    { "id": "place-jack-on-queen", "description": "Qのレーンに J は置けない", "lane": "Q♠", "card": "J♠", "expected": false },
+    { "id": "place-queen-on-queen", "description": "Qのレーンに Q は置ける", "lane": "Q♠", "card": "Q♥", "expected": true },
+    { "id": "place-queen-on-king", "description": "Kのレーンに Q は置けない", "lane": "K♦", "card": "Q♦", "expected": false },
+    { "id": "place-king-on-king", "description": "Kのレーンには K が置ける", "lane": "K♦", "card": "K♠", "expected": true },
+    { "id": "place-ace-on-king", "description": "Kのレーンにも A は置ける", "lane": "K♦", "card": "A♥", "expected": true },
+    { "id": "place-joker-on-king", "description": "Kのレーンにもジョーカーは置ける", "lane": "K♦", "card": "JK", "expected": true }
+  ],
+  "resolve": [
+    {
+      "id": "empty",
+      "description": "どちらも置いていない。何も起きない",
+      "lane": "5♠",
+      "cards": [null, null],
+      "expected": { "positions": [null, null], "outcome": "none", "values": null, "damage": null }
+    },
+    {
+      "id": "direct",
+      "description": "攻撃だけ。直撃で数字そのままのダメージ",
+      "lane": "5♠",
+      "cards": ["Q♠", null],
+      "expected": { "positions": ["attack", null], "outcome": "direct", "values": null, "damage": { "to": 1, "amount": 12 } }
+    },
+    {
+      "id": "direct-second-player",
+      "description": "後ろの席（1）の直撃。席0にダメージ",
+      "lane": "7♦",
+      "cards": [null, "9♦"],
+      "expected": { "positions": [null, "attack"], "outcome": "direct", "values": null, "damage": { "to": 0, "amount": 9 } }
+    },
+    {
+      "id": "defense-alone",
+      "description": "守備だけ。守備はダメージを与えない",
+      "lane": "5♠",
+      "cards": ["8♥", null],
+      "expected": { "positions": ["defense", null], "outcome": "none", "values": null, "damage": null }
+    },
+    {
+      "id": "defense-both",
+      "description": "守備どうし。何も起きない",
+      "lane": "5♠",
+      "cards": ["8♥", "K♣"],
+      "expected": { "positions": ["defense", "defense"], "outcome": "none", "values": null, "damage": null }
+    },
+    {
+      "id": "pierce-advantage",
+      "description": "ルール本文の例。♠は♥に有利なので攻撃が2倍（24対8）。差分16が貫通",
+      "lane": "5♠",
+      "cards": ["Q♠", "8♥"],
+      "expected": { "positions": ["attack", "defense"], "outcome": "pierce", "values": [24, 8], "damage": { "to": 1, "amount": 16 } }
+    },
+    {
+      "id": "blocked-disadvantage",
+      "description": "ルール本文の例。♣は♠に有利なので守備が2倍（12対16）。攻撃は防がれる",
+      "lane": "5♠",
+      "cards": ["Q♠", "8♣"],
+      "expected": { "positions": ["attack", "defense"], "outcome": "blocked", "values": [12, 16], "damage": null }
+    },
+    {
+      "id": "pierce-even",
+      "description": "♠と♦は対角で等倍（12対8）。差分4が貫通",
+      "lane": "5♠",
+      "cards": ["Q♠", "8♦"],
+      "expected": { "positions": ["attack", "defense"], "outcome": "pierce", "values": [12, 8], "damage": { "to": 1, "amount": 4 } }
+    },
+    {
+      "id": "blocked-even",
+      "description": "♥と♣は対角で等倍（7対9）。守備が上回り、攻撃は防がれる",
+      "lane": "6♥",
+      "cards": ["7♥", "9♣"],
+      "expected": { "positions": ["attack", "defense"], "outcome": "blocked", "values": [7, 9], "damage": null }
+    },
+    {
+      "id": "offset-even",
+      "description": "等倍で同値（9対9）。相殺",
+      "lane": "4♦",
+      "cards": ["9♦", "9♠"],
+      "expected": { "positions": ["attack", "defense"], "outcome": "offset", "values": [9, 9], "damage": null }
+    },
+    {
+      "id": "offset-advantage",
+      "description": "♣は♠に有利。攻撃6が2倍で12、守備Q（12）と同値。相殺",
+      "lane": "3♣",
+      "cards": ["6♣", "Q♠"],
+      "expected": { "positions": ["attack", "defense"], "outcome": "offset", "values": [12, 12], "damage": null }
+    },
+    {
+      "id": "offset-disadvantage",
+      "description": "♠は♥に有利。守備5が2倍で10、攻撃10と同値。相殺",
+      "lane": "2♥",
+      "cards": ["10♥", "5♠"],
+      "expected": { "positions": ["attack", "defense"], "outcome": "offset", "values": [10, 10], "damage": null }
+    },
+    {
+      "id": "blocked-second-player-attacks",
+      "description": "席1の攻撃を席0が守る。♦は♣に有利なので守備J（11）が2倍で22。攻撃9は防がれる",
+      "lane": "8♣",
+      "cards": ["J♦", "9♣"],
+      "expected": { "positions": ["defense", "attack"], "outcome": "blocked", "values": [22, 9], "damage": null }
+    },
+    {
+      "id": "pierce-second-player-attacks",
+      "description": "席1の攻撃。♦は♣に有利なので攻撃K（13）が2倍で26、守備7。差分19が席0に入る",
+      "lane": "6♦",
+      "cards": ["7♣", "K♦"],
+      "expected": { "positions": ["defense", "attack"], "outcome": "pierce", "values": [7, 26], "damage": { "to": 0, "amount": 19 } }
+    },
+    {
+      "id": "clash",
+      "description": "攻撃どうし。4すくみは関係なく、大きい方が差分を与える（10対7）",
+      "lane": "4♠",
+      "cards": ["10♠", "7♠"],
+      "expected": { "positions": ["attack", "attack"], "outcome": "clash", "values": [10, 7], "damage": { "to": 1, "amount": 3 } }
+    },
+    {
+      "id": "clash-second-player-wins",
+      "description": "攻撃どうしで席1の数字が大きい（3対13）。差分10が席0に入る",
+      "lane": "2♥",
+      "cards": ["3♥", "K♥"],
+      "expected": { "positions": ["attack", "attack"], "outcome": "clash", "values": [3, 13], "damage": { "to": 0, "amount": 10 } }
+    },
+    {
+      "id": "ace-attack-beats-face-defense",
+      "description": "Aの攻撃は絵札の守備に勝ち、絵札の数字（13）ぶんのダメージ",
+      "lane": "J♠",
+      "cards": ["A♠", "K♥"],
+      "expected": { "positions": ["attack", "defense"], "outcome": "aceWin", "values": null, "damage": { "to": 1, "amount": 13 } }
+    },
+    {
+      "id": "ace-attack-ignores-suit",
+      "description": "守備のスーツが有利（♦は♣に有利）でも、Aの攻撃は絵札に勝つ。ダメージは絵札の数字（13）で2倍にしない",
+      "lane": "Q♣",
+      "cards": ["A♣", "K♦"],
+      "expected": { "positions": ["attack", "defense"], "outcome": "aceWin", "values": null, "damage": { "to": 1, "amount": 13 } }
+    },
+    {
+      "id": "ace-attack-beats-face-attack",
+      "description": "Aの攻撃は絵札の攻撃にも勝ち、絵札の数字（12）ぶんのダメージ",
+      "lane": "J♥",
+      "cards": ["A♥", "Q♥"],
+      "expected": { "positions": ["attack", "attack"], "outcome": "aceWin", "values": null, "damage": { "to": 1, "amount": 12 } }
+    },
+    {
+      "id": "ace-defense-blocks-face-attack",
+      "description": "Aの守備は絵札の攻撃を防ぐ。ダメージなし",
+      "lane": "Q♦",
+      "cards": ["A♠", "K♦"],
+      "expected": { "positions": ["defense", "attack"], "outcome": "aceBlock", "values": null, "damage": null }
+    },
+    {
+      "id": "ace-defense-face-defense",
+      "description": "Aの守備と絵札の守備。何も起きない",
+      "lane": "J♣",
+      "cards": ["A♥", "Q♠"],
+      "expected": { "positions": ["defense", "defense"], "outcome": "none", "values": null, "damage": null }
+    },
+    {
+      "id": "ace-attack-vs-number",
+      "description": "相手が2〜10なら A は数字1。♥は♦に有利で2、守備4に防がれる",
+      "lane": "3♥",
+      "cards": ["A♥", "4♦"],
+      "expected": { "positions": ["attack", "defense"], "outcome": "blocked", "values": [2, 4], "damage": null }
+    },
+    {
+      "id": "ace-attack-vs-ten",
+      "description": "10は絵札ではない。♦は♣に有利なので守備10が2倍で20、Aの攻撃1は防がれる",
+      "lane": "10♣",
+      "cards": ["A♣", "10♦"],
+      "expected": { "positions": ["attack", "defense"], "outcome": "blocked", "values": [1, 20], "damage": null }
+    },
+    {
+      "id": "ace-defense-vs-number",
+      "description": "Aの守備は2〜10の攻撃を特別には防がない。♣は♠に有利で守備2、攻撃7。差分5",
+      "lane": "6♠",
+      "cards": ["A♣", "7♠"],
+      "expected": { "positions": ["defense", "attack"], "outcome": "pierce", "values": [2, 7], "damage": { "to": 0, "amount": 5 } }
+    },
+    {
+      "id": "ace-direct",
+      "description": "Aの直撃は1ダメージ",
+      "lane": "2♦",
+      "cards": ["A♦", null],
+      "expected": { "positions": ["attack", null], "outcome": "direct", "values": null, "damage": { "to": 1, "amount": 1 } }
+    },
+    {
+      "id": "ace-direct-on-face-lane",
+      "description": "絵札のレーンでも、相手がいなければ A の直撃は1ダメージ",
+      "lane": "K♥",
+      "cards": ["A♥", null],
+      "expected": { "positions": ["attack", null], "outcome": "direct", "values": null, "damage": { "to": 1, "amount": 1 } }
+    },
+    {
+      "id": "ace-vs-ace",
+      "description": "Aどうしは特別ルールなし。♠は♥に有利で2対1、差分1",
+      "lane": "K♠",
+      "cards": ["A♠", "A♥"],
+      "expected": { "positions": ["attack", "defense"], "outcome": "pierce", "values": [2, 1], "damage": { "to": 1, "amount": 1 } }
+    },
+    {
+      "id": "joker-direct-number-lane",
+      "description": "ジョーカーはレーン札の写し。9のレーンなら9の直撃",
+      "lane": "9♠",
+      "cards": ["JK", null],
+      "expected": { "positions": ["attack", null], "outcome": "direct", "values": null, "damage": { "to": 1, "amount": 9 } }
+    },
+    {
+      "id": "joker-direct-face-lane",
+      "description": "Kのレーンなら13の直撃",
+      "lane": "K♥",
+      "cards": [null, "JK"],
+      "expected": { "positions": [null, "attack"], "outcome": "direct", "values": null, "damage": { "to": 0, "amount": 13 } }
+    },
+    {
+      "id": "joker-direct-ace-lane",
+      "description": "Aのレーンなら1の直撃",
+      "lane": "A♦",
+      "cards": ["JK", null],
+      "expected": { "positions": ["attack", null], "outcome": "direct", "values": null, "damage": { "to": 1, "amount": 1 } }
+    },
+    {
+      "id": "joker-pierce-advantage",
+      "description": "ルール本文の例。ジョーカーは♠Qの攻撃。♠は♥に有利で24、守備13。差分11",
+      "lane": "Q♠",
+      "cards": ["JK", "K♥"],
+      "expected": { "positions": ["attack", "defense"], "outcome": "pierce", "values": [24, 13], "damage": { "to": 1, "amount": 11 } }
+    },
+    {
+      "id": "joker-blocked-disadvantage",
+      "description": "ジョーカーは♠9の攻撃。♣は♠に有利なので守備10が2倍で20。防がれる",
+      "lane": "9♠",
+      "cards": ["JK", "10♣"],
+      "expected": { "positions": ["attack", "defense"], "outcome": "blocked", "values": [9, 20], "damage": null }
+    },
+    {
+      "id": "joker-pierce-even",
+      "description": "ジョーカーは♦7の攻撃。♦と♠は等倍で7対5、差分2",
+      "lane": "7♦",
+      "cards": ["JK", "5♠"],
+      "expected": { "positions": ["attack", "defense"], "outcome": "pierce", "values": [7, 5], "damage": { "to": 1, "amount": 2 } }
+    },
+    {
+      "id": "joker-face-lane-blocked",
+      "description": "ジョーカーは♣Jの攻撃。♦は♣に有利なので守備Q（12）が2倍で24。防がれる",
+      "lane": "J♣",
+      "cards": ["JK", "Q♦"],
+      "expected": { "positions": ["attack", "defense"], "outcome": "blocked", "values": [11, 24], "damage": null }
+    },
+    {
+      "id": "joker-clash",
+      "description": "ジョーカー（8）と攻撃10。攻撃どうしで差分2が席0に入る",
+      "lane": "8♥",
+      "cards": ["JK", "10♥"],
+      "expected": { "positions": ["attack", "attack"], "outcome": "clash", "values": [8, 10], "damage": { "to": 0, "amount": 2 } }
+    },
+    {
+      "id": "joker-mutual",
+      "description": "ジョーカーどうし。どちらもレーン札と同じ数字の攻撃で同値。相打ち",
+      "lane": "7♥",
+      "cards": ["JK", "JK"],
+      "expected": { "positions": ["attack", "attack"], "outcome": "mutual", "values": [7, 7], "damage": null }
+    },
+    {
+      "id": "joker-face-lane-vs-ace-defense",
+      "description": "ルール本文の例。Kのレーンのジョーカーは絵札なので、Aの守備に防がれる",
+      "lane": "K♠",
+      "cards": ["JK", "A♥"],
+      "expected": { "positions": ["attack", "defense"], "outcome": "aceBlock", "values": null, "damage": null }
+    },
+    {
+      "id": "joker-face-lane-vs-ace-attack",
+      "description": "Jのレーンのジョーカーは絵札なので、Aの攻撃に負けて11ダメージ",
+      "lane": "J♦",
+      "cards": ["A♦", "JK"],
+      "expected": { "positions": ["attack", "attack"], "outcome": "aceWin", "values": null, "damage": { "to": 1, "amount": 11 } }
+    },
+    {
+      "id": "joker-ace-lane-vs-face-defense",
+      "description": "Aのレーンのジョーカーは A なので、絵札の守備に勝って13ダメージ",
+      "lane": "A♣",
+      "cards": ["JK", "K♥"],
+      "expected": { "positions": ["attack", "defense"], "outcome": "aceWin", "values": null, "damage": { "to": 1, "amount": 13 } }
+    },
+    {
+      "id": "joker-ace-lane-vs-face-attack",
+      "description": "Aのレーンのジョーカーは A なので、絵札の攻撃にも勝って12ダメージ",
+      "lane": "A♠",
+      "cards": ["Q♠", "JK"],
+      "expected": { "positions": ["attack", "attack"], "outcome": "aceWin", "values": null, "damage": { "to": 0, "amount": 12 } }
+    },
+    {
+      "id": "joker-ace-lane-vs-ace",
+      "description": "Aのレーンのジョーカー（A）と A の守備。Aどうしは特別ルールなし。♠は♥に有利で2対1",
+      "lane": "A♠",
+      "cards": ["JK", "A♥"],
+      "expected": { "positions": ["attack", "defense"], "outcome": "pierce", "values": [2, 1], "damage": { "to": 1, "amount": 1 } }
+    },
+    {
+      "id": "joker-ace-lane-vs-number",
+      "description": "Aのレーンのジョーカー（数字1）と守備2。♠は♥に有利なので守備が2倍で4。防がれる",
+      "lane": "A♥",
+      "cards": ["JK", "2♠"],
+      "expected": { "positions": ["attack", "defense"], "outcome": "blocked", "values": [1, 4], "damage": null }
+    },
+    {
+      "id": "joker-number-lane-vs-ace",
+      "description": "2〜10のレーンのジョーカーは A でも絵札でもない。♦は♣に有利で18対1、差分17",
+      "lane": "9♦",
+      "cards": ["JK", "A♣"],
+      "expected": { "positions": ["attack", "defense"], "outcome": "pierce", "values": [18, 1], "damage": { "to": 1, "amount": 17 } }
+    }
+  ]
+}
