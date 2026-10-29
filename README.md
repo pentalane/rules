@@ -4,7 +4,7 @@
 
 このリポジトリは、ペンタレーンのルールの**正本**です。ここにある [rules.md](rules.md) が公式ルールで、ほかの場所にあるルールの説明やアプリは、このルールに準拠するものとして扱います。ウェブで遊べる [pentalane.com](https://pentalane.com) も、準拠する実装の1つです。
 
-- **最新版：v1.0**（2026-10-29） → [rules.md](rules.md)
+- **最新版：v1.0.1**（2026-10-29） → [rules.md](rules.md)
 - 変更の記録 → [CHANGELOG.md](CHANGELOG.md)
 - 名前の使い方 → [NAMING.md](NAMING.md)
 - 準拠テストのケース集 → [tests/](tests/)
